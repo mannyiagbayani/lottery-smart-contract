@@ -1,0 +1,7 @@
+todo:
+1. add lottery contract
+2. create lottery test
+3. create compile.js
+4. create deploy.js
+5. deploy to infura
+6. create front-end using react
