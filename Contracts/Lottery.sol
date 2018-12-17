@@ -18,20 +18,35 @@ contract Lottery {
     
     //----FUNCTIONS-----
     //Callback function that will add address to PlayerAddresses
-    function () external payable {
+    function () external payable HasValidAmount {
         PlayerAddresses.push(msg.sender); 
     }
     
     //Calling this function will add the address to the PlayerAddresses
-    function EnterLottery() payable public {
+    function EnterLottery() payable public HasValidAmount {
         PlayerAddresses.push(msg.sender);
     }
     
     //Calling this function will return the current balance of the contract
-    function GetBalance() public view returns (uint256) {
+    function GetBalance() public view Restricted returns (uint256) {
         return address(this).balance;
     }
     
+    //Calling this function will generate a number of random kind
+    function GetRandomNumber() public view returns (uint256) {
+        return uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp, PlayerAddresses.length)));
+    }
     
+    //----MODIFIERS
+    //Modifier that will check if the ether amount being entered is greater than 0.01 
+    modifier HasValidAmount() {
+        require(msg.value > 0.01 ether,"Accepted value is greater than or equal to 0.01 ether.");
+        _;    
+    }
     
+    //Modifier that will check if the address is equal to manager address
+    modifier Restricted() {
+        require(msg.sender == Manager,"Only manager can use this function.");
+        _;
+    }
 }
