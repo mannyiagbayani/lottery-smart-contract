@@ -7,7 +7,7 @@ contract Lottery {
     address public Manager;
     
     //List of all players
-    address[] public PlayerAddresses;
+    address payable[] public PlayerAddresses;
     
     
     //----CONSTRUCTOR-----
@@ -19,7 +19,7 @@ contract Lottery {
     //----FUNCTIONS-----
     //Callback function that will add address to PlayerAddresses
     function () external payable HasValidAmount {
-        PlayerAddresses.push(msg.sender); 
+       PlayerAddresses.push(msg.sender); 
     }
     
     //Calling this function will add the address to the PlayerAddresses
@@ -35,6 +35,19 @@ contract Lottery {
     //Calling this function will generate a number of random kind
     function GetRandomNumber() public view returns (uint256) {
         return uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp, PlayerAddresses.length)));
+    }
+    
+    //Calling this function will give us the winner
+    function GetLotteryWinner() public payable  Restricted returns (address) {
+        uint randomNo = GetRandomNumber();
+        uint winnerNo = (randomNo % PlayerAddresses.length);
+        
+        address payable winnerAddress = PlayerAddresses[winnerNo];
+       
+        //transfer the balance to the winner
+        winnerAddress.transfer(address(this).balance);
+        
+        return winnerAddress;
     }
     
     //----MODIFIERS
